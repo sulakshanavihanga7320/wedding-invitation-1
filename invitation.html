@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* --- ප්‍රධාන හැඩගැන්වීම් --- */
+        body { font-family: 'Poppins', sans-serif; background-color: #fcf9f2; color: #4a4a4a; margin: 0; padding: 0; text-align: center; overflow-x: hidden; }
+        
+        #loader-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #fcf9f2; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 1s ease-out; }
+        .couple-gif { width: 200px; margin-bottom: 20px; mix-blend-mode: multiply; }
+        .loader-names { font-family: 'Great Vibes', cursive; font-size: 45px; color: #d4af37; margin: 0; animation: fadeIn 2s ease-in; }
+        .loader-text { font-size: 16px; letter-spacing: 3px; font-weight: 600; animation: fadeIn 3s ease-in; }
+        
+        #main-content { display: none; opacity: 0; }
+        .visible { display: block !important; animation: fadeIn 1.5s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; background-color: white; box-shadow: 0px 0px 15px rgba(0,0,0,0.1); min-height: 100vh; }
+        
+        /* --- Scroll Animation --- */
+        .scroll-animate { opacity: 0; transform: translateY(50px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .scroll-animate.show { opacity: 1; transform: translateY(0); }
+        
+        /* --- Hero Section (උඩම කොටස) --- */
+        .hero-frame { border: 1px solid #d4af37; outline: 1px solid #d4af37; outline-offset: -6px; padding: 40px 20px; margin: 20px 10px; background-color: #fdfbf7; position: relative; }
+        .hero-art { width: 60%; max-width: 200px; margin-bottom: 25px; mix-blend-mode: multiply; }
+        .name-serif { font-family: 'Playfair Display', serif; font-size: 32px; letter-spacing: 5px; margin: 5px 0; color: #2c2c2c; text-transform: uppercase; }
+        .ampersand { font-family: 'Great Vibes', cursive; font-size: 35px; color: #d4af37; margin: -5px 0; }
+        .divider-line { width: 60px; height: 1px; background-color: #d4af37; margin: 25px auto; }
+        .hero-date-time { font-family: 'Poppins', sans-serif; font-size: 11px; letter-spacing: 2px; color: #666; text-transform: uppercase; line-height: 1.8; }
+        .hero-venue-title { font-family: 'Great Vibes', cursive; font-size: 26px; color: #d4af37; margin-top: 20px; margin-bottom: 5px; }
+        .hero-venue-name { font-family: 'Poppins', sans-serif; font-size: 13px; letter-spacing: 3px; color: #2c2c2c; text-transform: uppercase; }
+        
+        /* --- Countdown --- */
+        .countdown-container { min-height: 150px; }
+        .countdown { display: flex; justify-content: center; gap: 15px; margin: 30px 0; background-color: #4a4a4a; color: white; padding: 15px; border-radius: 10px; }
+        .time-box { display: flex; flex-direction: column; font-size: 20px; font-weight: bold; }
+        .time-box span { font-size: 12px; font-weight: normal; }
+        #wedding-day-msg { display: none; padding: 30px 10px; animation: fadeIn 2s ease-in; }
+        #wedding-day-msg h2 { font-family: 'Great Vibes', cursive; color: #d4af37; font-size: 45px; margin: 0; }
+        
+        /* --- Our Story --- */
+        .story-section { padding: 20px 10px; margin: 40px 0; }
+        .story-title { font-family: 'Playfair Display', serif; font-size: 32px; color: #2c2c2c; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
+        .story-images-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+        .story-image { width: 45%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); mix-blend-mode: multiply; }
+        .story-text-description { padding: 0 15px; text-align: center; font-family: 'Playfair Display', serif; font-size: 16px; color: #4a4a4a; line-height: 1.8; }
+        .story-paragraph { margin: 15px 0; }
+        
+        /* --- Details & RSVP --- */
+        .details-box { border: 2px solid #d4af37; padding: 20px; margin: 30px 0; border-radius: 10px; }
+        .btn-map { display: inline-block; background-color: #d4af37; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 15px; font-weight: bold; }
+        input, select { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; font-family: 'Poppins', sans-serif; }
+        button.whatsapp-btn { background-color: #25D366; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 95%; margin-top: 10px; }
+        button.download-btn { background-color: #d4af37; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 95%; margin-top: 20px; }
+
+        /* --- ජෙනරේට් වන 'Traditional Art Card' එකේ හැඩගැන්වීම් --- */
+        #generated-card-container { display: none; margin-top: 20px; animation: fadeIn 1.5s ease-in; }
+        .art-pass { background-color: #fcf9f2; border: 1px solid #d4af37; outline: 1px solid #d4af37; outline-offset: -6px; padding: 40px 20px; box-shadow: 0px 10px 20px rgba(0,0,0,0.1); position: relative; max-width: 400px; margin: 0 auto; }
+        .art-hero-art { width: 60%; max-width: 200px; margin-bottom: 25px; mix-blend-mode: multiply; }
+        .art-name-serif { font-family: 'Playfair Display', serif; font-size: 30px; letter-spacing: 5px; margin: 5px 0; color: #2c2c2c; text-transform: uppercase; }
+        .art-ampersand { font-family: 'Great Vibes', cursive; font-size: 35px; color: #d4af37; margin: -5px 0; }
+        .art-hero-date-time { font-family: 'Poppins', sans-serif; font-size: 11px; letter-spacing: 2px; color: #666; text-transform: uppercase; line-height: 1.8; }
+        .art-hero-venue-title { font-family: 'Great Vibes', cursive; font-size: 26px; color: #d4af37; margin-top: 20px; margin-bottom: 5px; }
+        .art-hero-venue-name { font-family: 'Poppins', sans-serif; font-size: 13px; letter-spacing: 3px; color: #2c2c2c; text-transform: uppercase; }
+        .vip-guest-text { font-family: 'Poppins', sans-serif; font-size: 12px; color: #d4af37; letter-spacing: 4px; text-transform: uppercase; margin-top: -10px; margin-bottom: 15px; border: 1px solid #d4af37; display: inline-block; padding: 5px 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="loader-screen">
+        <img src="couple-hug.gif" alt="Couple Animation" class="couple-gif" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3800/3800058.png'"> 
+        <h1 class="loader-names">Dilip & Rashmi</h1>
+        <p class="loader-text">ARE GETTING MARRIED</p>
+    </div>
+
+    <div id="main-content">
+        <div class="container">
+            
+            <div class="hero-frame scroll-animate">
+                <img src="couple-art.png" alt="Couple Art" class="hero-art" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3800/3800058.png'">
+                <h2 class="name-serif">Dilip</h2>
+                <div class="ampersand">&</div>
+                <h2 class="name-serif">Rashmi</h2>
+                <div class="divider-line"></div>
+                <div class="hero-date-time">MONDAY, JUNE 01, 2026<br>10:00 AM</div>
+                <div class="hero-venue-title">Venue</div>
+                <div class="hero-venue-name">Avendra Gardens</div>
+            </div>
+
+            <hr style="border: 0.5px solid #eaeaea; margin: 30px 0;">
+
+            <div class="countdown-container scroll-animate">
+                <h3 id="countdown-title">Counting down to the big day</h3>
+                <div class="countdown" id="countdown-timer">
+                    <div class="time-box"><div id="days">00</div><span>Days</span></div>
+                    <div class="time-box"><div id="hours">00</div><span>Hours</span></div>
+                    <div class="time-box"><div id="mins">00</div><span>Mins</span></div>
+                    <div class="time-box"><div id="secs">00</div><span>Secs</span></div>
+                </div>
+                <div id="wedding-day-msg">
+                    <h2>අද අපේ මංගල දිනයයි! 🎉</h2>
+                    <p>ඔබගේ පැමිණීම ආදරයෙන් බලාපොරොත්තු වෙමු.</p>
+                </div>
+            </div>
+
+            <hr style="border: 0.5px solid #eaeaea; margin: 30px 0;">
+
+            <div class="story-section scroll-animate">
+                <h2 class="story-title">Our Story</h2>
+                <div class="story-images-container">
+                    <img src="story-1.jpg" alt="Our moment" class="story-image" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3800/3800058.png'">
+                    <img src="story-2.jpg" alt="Our rings" class="story-image" onerror="this.src='https://cdn-icons-png.flaticon.com/512/100/100108.png'">
+                </div>
+                <div class="story-text-description">
+                    <p class="story-paragraph">It's an unexpected and beautiful thing, how a chance meeting became the start of our story. We are overjoyed to welcome you to celebrate this journey with us.</p>
+                    <p class="story-paragraph">From simple moments to grand dreams, Dilip and Rashmi are excited to begin their life together forever. Your presence means the world to us.</p>
+                </div>
+            </div>
+
+            <hr style="border: 0.5px solid #eaeaea; margin: 30px 0;">
+
+            <div class="details-box scroll-animate">
+                <h2 style="font-family: 'Great Vibes', cursive; color: #d4af37; font-size: 35px; margin: 0;">Wedding Ceremony</h2>
+                <p><strong>Time:</strong> 10:00 AM</p>
+                <p><strong>Venue:</strong> Avendra Gardens, Negombo</p>
+                <a href="#" target="_blank" class="btn-map">📍 Get Directions</a>
+            </div>
+
+            <hr style="border: 0.5px solid #eaeaea; margin: 30px 0;">
+
+            <div class="scroll-animate" id="rsvp-form-container">
+                <h2 style="font-family: 'Great Vibes', cursive; color: #d4af37; font-size: 35px;">Please Confirm</h2>
+                <p>ඔබගේ පැමිණීම තහවුරු කරන්න</p>
+
+                <input type="text" id="guestName" placeholder="ඔබගේ නම (Your Name)" required>
+                <input type="number" id="guestPhone" placeholder="දුරකථන අංකය (Contact Number)" required>
+                
+                <select id="attendance">
+                    <option value="Joyfully Accepts">පැමිණෙනවා (Joyfully Accepts)</option>
+                    <option value="Regretfully Declines">පැමිණීමට නොහැක (Declines)</option>
+                </select>
+
+                <button class="whatsapp-btn" onclick="sendRSVP()">Send Reply via WhatsApp</button>
+            </div>
+
+            <div id="generated-card-container">
+                <h3 style="color: #25D366;">Thank You! 🎉</h3>
+                <p>ඔබගේ පිළිතුර ලැබුණා. කරුණාකර ඔබගේ Invitation එක Download කරගන්න.</p>
+                
+                <div class="art-pass" id="art-pass-card">
+                    <img src="couple-art.png" alt="Couple Art" class="art-hero-art" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3800/3800058.png'">
+                    <h2 class="art-name-serif">Dilip</h2>
+                    <div class="art-ampersand">&</div>
+                    <h2 class="art-name-serif">Rashmi</h2>
+                    <div class="divider-line"></div>
+
+                    <div class="vip-guest-text">GUEST INVITATION FOR</div>
+                    <div style="font-family: 'Great Vibes', cursive; font-size: 30px; color: #d4af37; margin-bottom: 20px;" id="display-guest-name">Name</div>
+
+                    <div class="art-hero-date-time">MONDAY, JUNE 01, 2026<br>10:00 AM</div>
+                    <div class="art-hero-venue-title">Venue</div>
+                    <div class="art-hero-venue-name">Avendra Gardens</div>
+                </div>
+
+                <button class="download-btn" onclick="downloadPass()">⬇ Download Invitation Image</button>
+            </div>
+            
+            <br><br>
+        </div>
+    </div>
+
+    <script>
+        // 1. Loading Screen Logic
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loader = document.getElementById('loader-screen');
+                const mainContent = document.getElementById('main-content');
+                loader.style.opacity = '0';
+                setTimeout(function() {
+                    loader.style.display = 'none';
+                    mainContent.classList.add('visible');
+                }, 1000); 
+            }, 4000); 
+        });
+
+        // 2. Scroll Animation Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('show');
+                    }
+                });
+            }, { threshold: 0.1 });
+            const hiddenElements = document.querySelectorAll('.scroll-animate');
+            hiddenElements.forEach((el) => observer.observe(el));
+        });
+
+        // 3. Countdown Logic
+        const weddingDate = new Date("June 01, 2026 10:00:00").getTime();
+        let confettiFired = false; 
+
+        const countdownInterval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval); 
+                document.getElementById("countdown-timer").style.display = "none";
+                document.getElementById("countdown-title").style.display = "none";
+                document.getElementById("wedding-day-msg").style.display = "block";
+
+                if(!confettiFired) {
+                    confettiFired = true;
+                    var duration = 5 * 1000; 
+                    var animationEnd = Date.now() + duration;
+                    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                    function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+                    var interval = setInterval(function() {
+                      var timeLeft = animationEnd - Date.now();
+                      if (timeLeft <= 0) { return clearInterval(interval); }
+                      var particleCount = 50 * (timeLeft / duration);
+                      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                    }, 250);
+                }
+            } else {
+                document.getElementById("days").innerHTML = Math.floor(distance / (1000 * 60 * 60 * 24));
+                document.getElementById("hours").innerHTML = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                document.getElementById("mins").innerHTML = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById("secs").innerHTML = Math.floor((distance % (1000 * 60)) / 1000);
+            }
+        }, 1000);
+
+        // 4. RSVP Logic
+        function sendRSVP() {
+            const name = document.getElementById("guestName").value;
+            const phone = document.getElementById("guestPhone").value;
+            const attendance = document.getElementById("attendance").value;
+
+            if(name === "" || phone === "") {
+                alert("කරුණාකර ඔබගේ නම සහ දුරකථන අංකය ඇතුලත් කරන්න!");
+                return;
+            }
+
+            const message = "Wedding Invitation Reply! 💍%0A" + 
+                            "Name: " + name + "%0A" + 
+                            "Phone: " + phone + "%0A" + 
+                            "Attendance: " + attendance;
+            const whatsappNumber = "94700000000"; // මෙතනට ඔයාගේ WhatsApp අංකය දෙන්න
+            const whatsappURL = "https://wa.me/" + whatsappNumber + "?text=" + message;
+            window.open(whatsappURL, "_blank");
+
+            if (attendance === "Joyfully Accepts") {
+                document.getElementById("rsvp-form-container").style.display = "none";
+                document.getElementById("display-guest-name").innerText = name;
+                document.getElementById("generated-card-container").style.display = "block";
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                document.getElementById("rsvp-form-container").innerHTML = "<h3 style='color: #d4af37; font-family: Playfair Display;'>Thank you for letting us know! We will miss you.</h3>";
+            }
+        }
+
+        // 5. Download Image Function (අලුත් කරපු එක)
+        function downloadPass() {
+            const cardElement = document.getElementById("art-pass-card");
+            
+            // ඩවුන්ලෝඩ් වෙද්දී වෙනස්කම් පේන්න පොඩි වෙලාවක් දෙනවා
+            setTimeout(() => {
+                html2canvas(cardElement, {
+                    scale: 3, 
+                    backgroundColor: "#fcf9f2",
+                    useCORS: true,      // පින්තූර කියවන්න අවසර ගන්නවා
+                    allowTaint: true    // ආරක්ෂක නීති මඟහරින්න උත්සාහ කරනවා
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'My_Wedding_Invitation.png'; 
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    alert("පින්තූරය Download කිරීමට නොහැක. කරුණාකර වෙබ් අඩවිය අන්තර්ජාලයට (Vercel) අප්ලෝඩ් කළ පසු නැවත උත්සාහ කරන්න.");
+                    console.error("Error downloading:", err);
+                });
+            }, 500); // තත්පර බාගයක් ඉඳලා ඩවුන්ලෝඩ් කරනවා
+        }
+    </script>
+
+</body>
+</html>
